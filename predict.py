@@ -29,5 +29,8 @@ def main():
     # Parse command-line arguments
     args = parse_args()
     
+    # Load model from checkpoint
+    model = load_checkpoint(args.checkpoint)
+    
 if __name__ == '__main__':
     main()

@@ -158,3 +158,18 @@ def save_checkpoint(model, args, train_data, save_dir, file_name):
     # Save checkpoint
     torch.save(checkpoint, path)
     
+def load_checkpoint(filepath):
+    ''' Loads a checkpoint and rebuilds the model
+    '''
+    
+    checkpoint = torch.load(filepath)
+    load_model = load_pretrained_model(arch=checkpoint['arch'], 
+                                       drop_out=checkpoint['drop_out'], 
+                                       hidden_units=checkpoint['hidden_units'], 
+                                       output_units=checkpoint['output_units'])
+    
+    load_model.load_state_dict(checkpoint['state_dict'])
+    load_model.class_to_idx = checkpoint['class_to_idx']
+    
+    return load_model
+    

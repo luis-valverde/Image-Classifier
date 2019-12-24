@@ -103,6 +103,32 @@ def train_model(model, epochs, gpu, learning_rate, data_loaders):
                 
     return model
 
+def test_model(model, test_loader, gpu):
+    ''' Test the trained network and measure the accuracy
+    '''
+
+    print("Testing the trained network")
+    
+    # Use GPU if it's specified in the command-line
+    device = torch.device("cuda" if gpu else "cpu")
+    
+    correct = 0
+    total = 0
+
+    with torch.no_grad():
+        for inputs, labels in test_loader:
+            # Move input and label tensors to the default device
+            inputs, labels = inputs.to(device), labels.to(device)
+
+            outputs = model(inputs)
+
+            _, predicted = torch.max (outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+            accuracy = (correct/total) * 100
+
+    print("Accuracy on test images: {:.3f}%. Total of images: {}".format(accuracy, total))
+    
 def main():
     # Parse command-line arguments
     args = parse_args()
@@ -129,6 +155,11 @@ def main():
                                 gpu=args.gpu, 
                                 learning_rate=args.learning_rate, 
                                 data_loaders=data_loaders)
+
+    # Test the trained model
+    test_model(model=trained_model, 
+               test_loader=data_loaders['test'],
+               gpu=args.gpu)
 
 if __name__ == '__main__':
     main()

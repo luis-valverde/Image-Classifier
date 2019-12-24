@@ -46,6 +46,12 @@ def main():
 
     # Create data loaders for the training, validation and testing sets
     data_loaders = create_dataloaders(datasets=data_sets)
-                          
+
+    # Load a pre-trained network
+    pretrained_model = load_pretrained_model(arch=args.arch,
+                                             drop_out=args.drop_out,
+                                             hidden_units=args.hidden_units,
+                                             output_units=args.output_units)
+                                                                  
 if __name__ == '__main__':
     main()

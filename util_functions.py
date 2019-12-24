@@ -91,4 +91,48 @@ def create_dataloaders(datasets):
                          }
     
     return result_dataloaders
+
+def choose_model(arch):
+    ''' Choose a pre-trained network for a given architecture
+    '''
+    
+    available_models = {'resnet18':[models.resnet18(pretrained=True), models.resnet18(pretrained=True).fc.in_features],
+                        'alexnet':[models.alexnet(pretrained=True), models.alexnet(pretrained=True).classifier[1].in_features],
+                        'vgg16':[models.vgg16(pretrained=True), models.vgg16(pretrained=True).classifier[0].in_features],
+                        'densenet121':[models.densenet121(pretrained=True), models.densenet121(pretrained=True).classifier.in_features]
+                       }
+    
+    
+    # Look for the model for the given architecture
+    if arch in available_models:
+        # Return model and model input_features size
+        return available_models[arch][0], available_models[arch][1]
+    else:
+        sys.exit('There is not a pre-trained model for the specified architecture: {}'.format(arch))
+
+def load_pretrained_model(arch, drop_out, hidden_units, output_units):
+    ''' Load a pre-trained network for a given architecture
+    '''
+    
+    print("Loading a pre-trained network")
+    
+    # Load a pre-trained network
+    model, in_features = choose_model(arch=arch)
+    
+    # Freeze parameters so it doesn't backprop through them
+    for param in model.parameters():
+        param.requires_grad = False
+    
+    # Build a feed-forward network
+    classifier = nn.Sequential(
+        nn.Linear(in_features, hidden_units),
+        nn.ReLU(),
+        nn.Dropout(drop_out),
+        nn.Linear(hidden_units, output_units),
+        nn.LogSoftmax(dim=1)
+    )
+
+    model.classifier = classifier
+    
+    return model
     

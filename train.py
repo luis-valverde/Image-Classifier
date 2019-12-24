@@ -161,5 +161,12 @@ def main():
                test_loader=data_loaders['test'],
                gpu=args.gpu)
 
+    # Save checkpoint of the trained model
+    save_checkpoint(model=trained_model, 
+                    args=args,
+                    train_data=data_sets['train'], 
+                    save_dir=args.save_dir, 
+                    file_name='model_checkpoint')
+                    
 if __name__ == '__main__':
     main()

@@ -136,3 +136,25 @@ def load_pretrained_model(arch, drop_out, hidden_units, output_units):
     
     return model
     
+def save_checkpoint(model, args, train_data, save_dir, file_name):
+    ''' Save checkpoint of the trained model
+    '''
+    
+    print("Saving checkpoint")
+    
+    model.class_to_idx = train_data.class_to_idx
+    model.cpu()
+
+    checkpoint = {'state_dict': model.state_dict(),
+                  'class_to_idx': model.class_to_idx,
+                  'drop_out':args.drop_out,
+                  'arch': args.arch,
+                  'hidden_units':args.hidden_units, 
+                  'output_units':args.output_units}
+    
+    # Path and name of the checkpoint file
+    path = save_dir + file_name + '.pth'
+    
+    # Save checkpoint
+    torch.save(checkpoint, path)
+    

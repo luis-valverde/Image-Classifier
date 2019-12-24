@@ -33,6 +33,76 @@ def parse_args():
 
     return args
 
+def train_model(model, epochs, gpu, learning_rate, data_loaders):
+    ''' Train the classifier layers with backpropagation using the pre-trained network to get the features
+    '''
+    
+    print("Training the pre-trained network")
+    
+    # Use GPU if it's specified in the command-line
+    device = torch.device("cuda" if gpu else "cpu")
+    
+    # Move the model to the specific device
+    model.to(device)
+
+    criterion = nn.NLLLoss()
+
+    # Only train the classifier parameters, feature parameters are frozen
+    optimizer = optim.Adam(model.classifier.parameters(), lr = learning_rate)
+    
+    steps = 0
+    running_loss = 0
+    print_every = 40
+    for epoch in range(epochs):
+        running_loss = 0
+        for inputs, labels in data_loaders['train']:
+            steps += 1
+
+            # Move input and label tensors to the default device
+            inputs, labels = inputs.to(device), labels.to(device)
+
+            optimizer.zero_grad()
+            logps = model.forward(inputs)
+            loss = criterion(logps, labels)
+            loss.backward()
+            optimizer.step()
+
+            running_loss += loss.item()
+
+            if steps % print_every == 0:
+                valid_loss = 0
+                accuracy = 0
+
+                # switching to evaluation mode so that dropout is turned off
+                model.eval()
+
+                # Turn off gradients for validation, saves memory and computations
+                with torch.no_grad():
+                    for inputs, labels in data_loaders['valid']:
+                        inputs, labels = inputs.to(device), labels.to(device)
+                        logps = model.forward(inputs)
+                        batch_loss = criterion(logps, labels)
+
+                        valid_loss += batch_loss.item()
+
+                        # Calculate accuracy
+                        ps = torch.exp(logps)
+                        top_p, top_class = ps.topk(1, dim=1)
+                        equality = (labels.data == ps.max(dim=1)[1])
+                        accuracy += equality.type(torch.FloatTensor).mean()
+
+                print("Epoch: {}/{}.. ".format(epoch+1, epochs),
+                      "Training Loss: {:.3f}.. ".format(running_loss/print_every),
+                      "Valid Loss: {:.3f}.. ".format(valid_loss/len(data_loaders['valid'])),
+                      "Valid Accuracy: {:.3f}%".format(accuracy/len(data_loaders['valid'])*100))
+
+                running_loss = 0
+
+                # Make sure training is back on
+                model.train()
+                
+    return model
+
 def main():
     # Parse command-line arguments
     args = parse_args()
@@ -52,6 +122,13 @@ def main():
                                              drop_out=args.drop_out,
                                              hidden_units=args.hidden_units,
                                              output_units=args.output_units)
-                                                                  
+
+    # Train the model
+    trained_model = train_model(model=pretrained_model, 
+                                epochs=args.epochs, 
+                                gpu=args.gpu, 
+                                learning_rate=args.learning_rate, 
+                                data_loaders=data_loaders)
+
 if __name__ == '__main__':
     main()

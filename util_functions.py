@@ -173,3 +173,15 @@ def load_checkpoint(filepath):
     
     return load_model
     
+def process_image(image_path):
+    ''' Scales, crops, and normalizes a PIL image for a PyTorch model,
+        returns an Numpy array
+    '''
+    # Tranform for the testing data
+    test_transforms = create_transforms()['test']
+    
+    # Process a PIL image for use in a PyTorch model
+    with Image.open(image_path) as image:  
+        image = test_transforms(image)
+        
+    return image

@@ -37,5 +37,15 @@ def main():
     # Parse command-line arguments
     args = parse_args()
 
+    # Create transforms for the training, validation, and testing sets
+    transforms = create_transforms()
+
+    # Create datasets for the training, validation and testing sets
+    data_sets = create_datasets(data_directory=args.data_directory, 
+                                transforms=transforms)
+
+    # Create data loaders for the training, validation and testing sets
+    data_loaders = create_dataloaders(datasets=data_sets)
+                          
 if __name__ == '__main__':
     main()

@@ -37,5 +37,8 @@ def main():
     # Parse command-line arguments
     args = parse_args()
 
+    # Create transforms for the training, validation, and testing sets
+    transforms = create_transforms()
+    
 if __name__ == '__main__':
     main()

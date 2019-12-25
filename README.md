@@ -16,11 +16,11 @@
 This repository contains all my work for the Udacity's Machine Learning Introduction Nanodegree Program.
 
 The goal of this project was to train an image classifier to recognize different species of flowers.
-To accomplish this, I loaded a pre-trained model and defined a new untrained feed-forward network as a classifier. The classifier layers were then trainned using backpropagation on preprocessed flowers data.
+To accomplish this, I loaded a pre-trained model and defined a new untrained feed-forward network as a classifier. The classifier layers were then trained using backpropagation on preprocessed flowers data.
 The loss and accuracy on the validation set were tracked to determine the best hyperparameters.
 
 Then, the trained model was verified on test data (images the network has never seen either in training or validation) to give a good estimate of the model's performance on completely new images.
-Finally, the trainned model was used to predict the class (or classes) of an image using the trained deep learning model.
+Finally, the trained model was used to predict the class (or classes) of an image using the trained deep learning model.
 
 ## Project Overview
 
